@@ -1,0 +1,19 @@
+setup:
+    language: 'tr'
+    model_dir: './example_dir'
+    vocab_dir: './example_dir/vocab.json'
+
+model:
+    attention_dropout: 0.1
+    hidden_dropout: 0.1
+    feat_proj_dropout: 0.0
+    mask_time_prob: 0.05
+    layerdrop: 0.1
+    gradient_checkpointing: True
+
+args:
+    batch_size: 16
+    steps: 2
+    epochs: 10
+    learning_rate: .0003
+    
