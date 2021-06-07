@@ -108,7 +108,7 @@ model.freeze_feature_extractor()
 
 # Define training arguments and set up trainer
 training_args = TrainingArguments(
-  output_dir=config['setup']['model_dir']
+  output_dir=config['setup']['model_dir'],
   group_by_length=True,
   per_device_train_batch_size=config['args']['batch_size'],
   gradient_accumulation_steps=config['args']['steps'],
