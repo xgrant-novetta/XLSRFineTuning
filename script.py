@@ -25,6 +25,7 @@ import torchaudio
 import re
 import json
 import FTMethods as ftm
+import os
 
 
 # load YAML config file
@@ -44,9 +45,12 @@ common_voice_test = common_voice_test.remove_columns(["accent", "age", "client_i
 
 
 # Remove special characters, outside of the ones you want to ignore
-chars_to_ignore_regex = '[\,\?\.\!\-\;\:\"\“\%\‘\”\�]'
+
 common_voice_train = common_voice_train.map(ftm.remove_special_characters)
+                                          
 common_voice_test = common_voice_test.map(ftm.remove_special_characters)
+
+
 
 
 # Collect the vocabulary lists from the train and test sets
@@ -64,6 +68,9 @@ vocab_dict["[UNK]"] = len(vocab_dict)
 vocab_dict["[PAD]"] = len(vocab_dict)
 print("length of the vocab_dict is", len(vocab_dict))
 
+if not os.path.exists(config['setup']['model_dir']):
+    os.makedirs(config['setup']['model_dir'])
+    
 with open(config['setup']['vocab_dir'], 'w') as vocab_file:
     json.dump(vocab_dict, vocab_file)
     
@@ -84,8 +91,21 @@ common_voice_train = common_voice_train.map(ftm.resample, num_proc=4)
 common_voice_test = common_voice_test.map(ftm.resample, num_proc=4)
 
 # Process and ensure correct sampling rates
-common_voice_train = common_voice_train.map(ftm.prepare_dataset, remove_columns=common_voice_train.column_names, batch_size=8, num_proc=4, batched=True)
-common_voice_test = common_voice_test.map(ftm.prepare_dataset, remove_columns=common_voice_test.column_names, batch_size=8, num_proc=4, batched=True)
+def prepare_dataset(batch):
+    # check that all files have the correct sampling rate
+    assert (
+        len(set(batch["sampling_rate"])) == 1
+    ), f"Make sure all inputs have the same sampling rate of {processor.feature_extractor.sampling_rate}."
+
+    batch["input_values"] = processor(batch["speech"], sampling_rate=batch["sampling_rate"][0]).input_values
+    
+    with processor.as_target_processor():
+        batch["labels"] = processor(batch["target_text"]).input_ids
+    return batch
+
+common_voice_train = common_voice_train.map(prepare_dataset, remove_columns=common_voice_train.column_names, batch_size=8, num_proc=4, batched=True)
+common_voice_test = common_voice_test.map(prepare_dataset, remove_columns=common_voice_test.column_names, batch_size=8, num_proc=4, batched=True)
+
 
 # Define the data collator and evaluation metric
 data_collator = ftm.DataCollatorCTCWithPadding(processor=processor, padding=True)
@@ -124,6 +144,21 @@ training_args = TrainingArguments(
   warmup_steps=500,
   save_total_limit=2,
 )
+
+def compute_metrics(pred):
+    pred_logits = pred.predictions
+    pred_ids = np.argmax(pred_logits, axis=-1)
+
+    pred.label_ids[pred.label_ids == -100] = processor.tokenizer.pad_token_id
+
+    pred_str = processor.batch_decode(pred_ids)
+    # we do not want to group tokens when computing the metrics
+    label_str = processor.batch_decode(pred.label_ids, group_tokens=False)
+
+    wer = wer_metric.compute(predictions=pred_str, references=label_str)
+
+    return {"wer": wer}
+
 
 trainer = Trainer(
     model=model,

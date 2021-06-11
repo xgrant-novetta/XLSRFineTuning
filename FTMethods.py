@@ -1,3 +1,30 @@
+from datasets import load_dataset, load_metric
+from datasets import ClassLabel
+from IPython.display import display, HTML
+from transformers import Wav2Vec2CTCTokenizer
+from transformers import Wav2Vec2FeatureExtractor
+from transformers import Wav2Vec2Processor
+from transformers import Wav2Vec2ForCTC
+from transformers import TrainingArguments
+from transformers import Trainer
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Union
+
+import librosa
+import numpy as np
+import IPython.display as ipd
+import yaml
+import numpy as np
+import random
+import torch
+import random
+import pandas as pd
+import torchaudio
+import re
+import json
+import FTMethods as ftm
+import os
+
 
 @dataclass
 class DataCollatorCTCWithPadding:
@@ -62,6 +89,12 @@ class DataCollatorCTCWithPadding:
         return batch
 
 
+    
+# load YAML config file
+with open("config.yml", "r") as ymlfile:
+    config = yaml.load(ymlfile)
+    
+    
 def show_random_elements(dataset, num_examples=10):
     assert num_examples <= len(dataset), "Can't pick more elements than there are in the dataset."
     picks = []
@@ -75,7 +108,8 @@ def show_random_elements(dataset, num_examples=10):
     display(HTML(df.to_html()))
     
 def remove_special_characters(batch):
-    batch["sentence"] = re.sub(chars_to_ignore_regex, '', batch["sentence"]).lower() + " "
+    chars = config['setup']['chars_to_ignore']
+    batch["sentence"] = re.sub(chars, '', batch["sentence"]).lower() + " "
     return batch
 
 def extract_all_chars(batch):
@@ -95,30 +129,6 @@ def resample(batch):
     batch["sampling_rate"] = 16_000
     return batch
 
-def prepare_dataset(batch):
-    # check that all files have the correct sampling rate
-    assert (
-        len(set(batch["sampling_rate"])) == 1
-    ), f"Make sure all inputs have the same sampling rate of {processor.feature_extractor.sampling_rate}."
 
-    batch["input_values"] = processor(batch["speech"], sampling_rate=batch["sampling_rate"][0]).input_values
-    
-    with processor.as_target_processor():
-        batch["labels"] = processor(batch["target_text"]).input_ids
-    return batch
-
-def compute_metrics(pred):
-    pred_logits = pred.predictions
-    pred_ids = np.argmax(pred_logits, axis=-1)
-
-    pred.label_ids[pred.label_ids == -100] = processor.tokenizer.pad_token_id
-
-    pred_str = processor.batch_decode(pred_ids)
-    # we do not want to group tokens when computing the metrics
-    label_str = processor.batch_decode(pred.label_ids, group_tokens=False)
-
-    wer = wer_metric.compute(predictions=pred_str, references=label_str)
-
-    return {"wer": wer}
 
 

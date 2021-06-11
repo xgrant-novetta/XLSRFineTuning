@@ -1,7 +1,9 @@
 setup:
-    language: 'tr'
-    model_dir: './example_dir'
-    vocab_dir: './example_dir/vocab.json'
+    language: 'ky'
+    model_dir: './kyrgyz_model'
+    vocab_dir: './kyrgyz_model/vocab.json'
+    chars_to_ignore: '[\,\?\.\!\-\;\:\"\“\%\‘\”\�]'
+
 
 model:
     attention_dropout: 0.1
@@ -14,6 +16,6 @@ model:
 args:
     batch_size: 16
     steps: 2
-    epochs: 10
+    epochs: 5
     learning_rate: .0003
     
