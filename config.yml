@@ -16,6 +16,6 @@ model:
 args:
     batch_size: 16
     steps: 2
-    epochs: 5
+    epochs: 10
     learning_rate: .0003
     
