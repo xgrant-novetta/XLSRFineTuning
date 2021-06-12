@@ -12,7 +12,7 @@ Update and install dependencies with apt-get
 > apt-get update
 apt-get install -y git cmake libsndfile1 libsndfile1-dev
 
-Install pytorch versions if you need to from [here] (https://pytorch.org/get-started/previous-versions/)
+Install pytorch versions if you need to from [here](https://pytorch.org/get-started/previous-versions/)
 
 Install requirements
 > pip install -r requirements.txt
