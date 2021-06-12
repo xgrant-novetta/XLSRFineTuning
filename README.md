@@ -1,6 +1,6 @@
 # XLSRFineTuning
 
-Based on the [Hugging Face competition] (https://huggingface.co/facebook/wav2vec2-large-xlsr-53) for transfer-learning with Facebook's Cross-Lingual Speech Recognition Wav2vec2 model. This is a script for training language models using transfer learning for languages with at least 500MB of data in the [Common Voice] (https://commonvoice.mozilla.org/en/datasets) dataset.
+Based on the [Hugging Face competition](https://huggingface.co/facebook/wav2vec2-large-xlsr-53) for transfer-learning with Facebook's Cross-Lingual Speech Recognition Wav2vec2 model. This is a script for training language models using transfer learning for languages with at least 500MB of data in the [Common Voice](https://commonvoice.mozilla.org/en/datasets) dataset.
 
 
 ## How to Use
