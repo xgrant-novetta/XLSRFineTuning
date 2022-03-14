@@ -7,17 +7,21 @@ Based on the [Hugging Face competition](https://huggingface.co/facebook/wav2vec2
 
 **Requirements**
 
-Update and install dependencies with apt-get
+Update and install dependencies with conda
 
-> apt-get update
-apt-get install -y git cmake libsndfile1 libsndfile1-dev
+'conda install -c conda-forge libsndfile librosa pydub'
 
 Install pytorch versions if you need to from [here](https://pytorch.org/get-started/previous-versions/)
 
 Install requirements
-> pip install -r requirements.txt
 
-Edit the setup section in config.yml. The language code from the CommonVoice dataset version. For example, English (version en_2181h_2020-12-11) has language code 'en'. Be sure to add the paths for your model and vocab.json file and then any extra characters you want the trainer to ignore. You can edit other configurations as you train.
+'pip install -r requirements.txt'
+
+Before beginning, download the dataset from your language and make note of the folder location. The aduio will need to be converted to wav format and resampled to 16kHz. convert.py and resample.py are included
+
+Edit the setup section in config.yml. The language code is from the CommonVoice dataset version. For example, English (version en_2181h_2020-12-11) has language code 'en'. Be sure to add the paths to your model and vocab.json file, and then any extra characters you want the trainer to ignore. Edit other configurations as needed.
+
+Run 'python script.py' to begin.
 
 
 

@@ -92,8 +92,7 @@ class DataCollatorCTCWithPadding:
     
 # load YAML config file
 with open("config.yml", "r") as ymlfile:
-    config = yaml.load(ymlfile)
-    
+    config = yaml.load(ymlfile, Loader=yaml.FullLoader)
     
 def show_random_elements(dataset, num_examples=10):
     assert num_examples <= len(dataset), "Can't pick more elements than there are in the dataset."
