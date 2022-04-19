@@ -1,5 +1,6 @@
 datasets==2.1.0
 ipython==7.16.3
+jiwer==2.3.0
 librosa==0.9.1
 torch==1.10.1
 torchaudio==0.10.1
