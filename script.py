@@ -1,5 +1,3 @@
-
-
 from datasets import load_dataset, load_metric
 from datasets import ClassLabel
 from IPython.display import display, HTML
@@ -30,7 +28,7 @@ import os
 
 # load YAML config file
 with open("config.yml", "r") as ymlfile:
-    config = yaml.load(ymlfile)
+    config = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 
 # Load the train and test datasets
